@@ -4,5 +4,16 @@
   "description": "simple server for conference of SUD church",
   "main": "index.js",
   "author": "Nacelio M Barbosa<naceliombdev@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon ./index.js"
+  },
+  "type": "module",
+  "dependencies": {
+    "express": "^4.17.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
 }
