@@ -1,0 +1,8 @@
+{
+  "name": "server-conference",
+  "version": "0.0.1",
+  "description": "simple server for conference of SUD church",
+  "main": "index.js",
+  "author": "Nacelio M Barbosa<naceliombdev@gmail.com>",
+  "license": "MIT"
+}
