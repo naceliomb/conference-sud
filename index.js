@@ -1,6 +1,7 @@
 import express from "express";
 import fs, { read, readFile, readFileSync, writeFile, writeFileSync } from "fs";
 import Orator from "./src/models/Orator.js";
+import path from "path";
 const oratorsFile = "./orators.json";
 
 const app = express();
@@ -9,8 +10,12 @@ const PORT = 5000;
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-
 app.get("/", (req, res) => {
+    return res.sendFile(path.join(path.resolve()+"/src/views/index.html"));
+});
+
+
+app.get("/orators", (req, res) => {
     readFile(oratorsFile, (error, data) => {
         if(error){
             console.log(error);
@@ -24,7 +29,7 @@ app.get("/", (req, res) => {
     });
 });
 
-app.post("/", (req,res) => {
+app.post("/orators", (req,res) => {
     const { name } = req.body;
     const { role } = req.body;
 

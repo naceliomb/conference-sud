@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+</head>
+<body>
+    <h1>Hello World</h1>
+    <div id="orators">
+        <select name="orators" id="select-orators">
+
+        </select>
+    </div>
+    <div class="add-orator">
+        <form action="" class="add" id="add-orator-form">
+            <h3>Adicionar orador</h3>
+            <label for="orator-name">Orador</label>
+            <input type="text" name="orator-name" id="orator-name-add">
+            <label for="orator-name">Chamado</label>
+            <input type="text" name="orator-role" id="orator-role-add">
+            <input type="submit" value="Cadastrar">
+        </form>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+
+
+        //add
+
+        const addOratorForm = document.querySelector("#add-orator-form");
+        let oratorName = document.querySelector("#orator-name-add");
+        let oratorRole = document.querySelector("#orator-role-add");
+
+        addOratorForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            axios.post('/orators', {
+                name: oratorName.value,
+                role: oratorRole.value
+            }).then( (response) => {
+                console.log(response);
+                alert("Orador cadastrado com sucesso!");
+                document.location.reload(true);
+            }).catch( (error) => {
+                console.log(error);
+            });
+        });
+
+
+        //list
+
+        const orators = document.querySelector("#select-orators");
+        let optionDefault = document.createElement("option");
+
+        axios.get('/orators')
+            .then((response) => {
+                if(response.status != 200){
+                    return;
+                }
+                if(!response.data.length){
+                    let option = document.createElement("option");
+                    option.setAttribute("value", "");
+                    option.innerHTML = "Cadastre um orador antes!";
+                    orators.append(option);
+                    orators.disabled = true;
+
+                    
+                    return;
+                }
+                for(let i = 0; i < response.data.length; i++){
+                    let option = document.createElement("option");
+                    
+
+                    if(i!=0){
+                        option.setAttribute("value", `${response.data[i].name}`);
+                        option.innerHTML = `${response.data[i].name}`;
+                        orators.append(option);
+                        continue;
+                    }
+
+                    optionDefault.setAttribute("value", "");
+                    optionDefault.innerHTML = "Selecione uma opção";
+                    orators.append(optionDefault);
+                    option.setAttribute("value", `${response.data[i].name}`);
+                    option.innerHTML = `${response.data[i].name}`;
+                    orators.append(option);
+                    
+                }
+            })
+            .catch( (error) => {
+                console.log(error);
+            });
+
+
+    </script>
+</body>
+</html>
