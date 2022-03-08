@@ -1,42 +1,14 @@
 [
   {
-    "name": "Nacelio M BarbossaA",
-    "role": "Presidente da porra todaa"
+    "id": 0,
+    "name": "Nacelio M Barbosa",
+    "role": "Conselheiro",
+    "active": false
   },
   {
-    "name": "Nacelio M",
-    "role": "Presidente da porra todaa"
-  },
-  {
-    "name": "nacelio",
-    "role": "test"
-  },
-  {
-    "name": "Moreira",
-    "role": "test"
-  },
-  {
-    "name": "moreirinha",
-    "role": "test"
-  },
-  {
-    "name": "nacelio",
-    "role": "presidente"
-  },
-  {
-    "name": "nacelio",
-    "role": "presidente"
-  },
-  {
-    "name": "moreira",
-    "role": "karlos"
-  },
-  {
-    "name": "moreira",
-    "role": "karlos"
-  },
-  {
-    "name": "teste",
-    "role": "teste"
+    "id": 1,
+    "name": "Jonatan DFJ",
+    "role": "Conselheiro",
+    "active": true
   }
 ]

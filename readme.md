@@ -2,8 +2,9 @@
 
 ## features
 
-- [] Add Orator
-- [] List orators
+- [x] Add Orator
+- [x] List orators
+- [x] Set actual orator
 - [] Set first pray
 - [] Set last pray
 - [] Set Title for meet
