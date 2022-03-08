@@ -3,6 +3,7 @@ import fs, { read, readFile, readFileSync, writeFile, writeFileSync } from "fs";
 import Orator from "./src/models/Orator.js";
 import Music from "./src/models/Music.js";
 import path from "path";
+import { send } from "process";
 const oratorsFile = "./orators.json";
 const musicsFile = "./musics.json";
 
@@ -14,6 +15,11 @@ app.use(express.json());
 
 app.get("/", (req, res) => {
     return res.sendFile(path.join(path.resolve()+"/src/views/index.html"));
+});
+
+
+app.get("/dashboard", (req, res) => {
+    return res.sendFile(path.join(path.resolve()+"/src/views/dashboard.html"));
 });
 
 app.get("/orators", (req, res) => {
@@ -35,12 +41,14 @@ app.post("/orators", (req,res) => {
     const { name } = req.body;
     const { role } = req.body;
     const { active } = req.body || false;
+    const { firstPray } = req.body || false;
+    const { lastPray } = req.body || false;
 
     if (!name || !role){
         return res.status(400).json("Invalid input data");
     }
 
-    const orator = new Orator(id, name, role, active);
+    const orator = new Orator(id, name, role, active, firstPray, lastPray);
 
     readFile(oratorsFile, (error, data) => {
         if(error){
@@ -69,6 +77,8 @@ app.put("/orators/:oratorId", (req, res) => {
     const { name } = req.body;
     const { role } = req.body;
     const { active } = req.body || false;
+    const { firstPray } = req.body || false;
+    const { lastPray } = req.body || false;
 
     readFile(oratorsFile, (error, data) => {
         if(error){
@@ -91,7 +101,21 @@ app.put("/orators/:oratorId", (req, res) => {
                 parsedData.forEach((orator) => {
                     orator.active = false;
                 });
-                const newOrator = new Orator(Number(oratorId), name, role, active);
+                const newOrator = new Orator(Number(oratorId), name, role, active, firstPray, lastPray);
+                parsedData.splice(foundOratorIndex, 1, newOrator);
+            }
+            if(firstPray){
+                parsedData.forEach((orator) => {
+                    orator.firstPray = false;
+                });
+                const newOrator = new Orator(Number(oratorId), name, role, active, firstPray, lastPray);
+                parsedData.splice(foundOratorIndex, 1, newOrator);
+            }
+            if(lastPray){
+                parsedData.forEach((orator) => {
+                    orator.lastPray = false;
+                });
+                const newOrator = new Orator(Number(oratorId), name, role, active, firstPray, lastPray);
                 parsedData.splice(foundOratorIndex, 1, newOrator);
             }
         }

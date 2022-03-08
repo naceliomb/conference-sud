@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+        crossorigin="anonymous"></script>
+    <title>Dashboard</title>
+    <style>
+        #body{
+            margin: 0;
+            padding: 0;
+        }
+        #app{
+            width: 100%;
+            height: 100%;
+            max-width: 100vw;
+            max-height: 100vh;
+            padding: 20px;
+        }
+        #app h1{
+            text-align: center;
+        }
+        #app .actual-orator{
+            width: 100%;
+            height: auto;
+            max-width: 900px;
+        }
+        #app .add-orator{
+            width: 100%;
+            height: auto;
+            max-width: 900px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1 id="meet-title">Hello World</h1>
+        <section class="add-orator">
+            <form id="add-orator-form" class="row gy-2 gx-3 align-items-center">
+                <h3>Adicionar orador</h3>
+                <div class="col-auto">
+                  <div class="input-group">
+                    <div class="input-group-text">Nome</div>
+                    <input type="text" class="form-control" id="orator-name-add">
+                  </div>
+                </div>
+                <div class="col-auto">
+                  <div class="input-group">
+                    <div class="input-group-text">Chamado</div>
+                    <input type="text" class="form-control" id="orator-role-add">
+                  </div>
+                </div>
+                <div class="col-auto">
+                  <button type="submit" class="btn btn-primary">Adicionar Orador</button>
+                </div>
+              </form>
+        </section>
+        <section class="add-music">
+            <form id="add-music-form" class="row gy-2 gx-3 align-items-center">
+                <h3>Adicionar Hino</h3>
+                <div class="col-auto">
+                  <div class="input-group">
+                    <div class="input-group-text">Nome</div>
+                    <input type="text" class="form-control" id="music-name-add">
+                  </div>
+                </div>
+                <div class="col-auto">
+                  <div class="input-group">
+                    <div class="input-group-text">Página</div>
+                    <input type="text" class="form-control" id="music-page-add">
+                  </div>
+                </div>
+                <div class="col-auto">
+                  <button type="submit" class="btn btn-primary">Adicionar Hino</button>
+                </div>
+              </form>
+        </section>
+
+        <section class="actual-orator">
+            <form class="row gy-2 gx-3 align-items-center" id="actual-orator-form">
+                <h3>Orador atual</h3>
+                <div class="col-auto">
+                    <select id="actual-orator-select" class="select-orators form-select" aria-label="Default select example">
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary">Selecionar</button>
+                </div>
+            </form>
+        </section>
+        
+        <section class="first-pray-orator">
+            <form class="row gy-2 gx-3 align-items-center" id="first-pray-orator-form">
+                <h3>Primeira oração</h3>
+                <div class="col-auto">
+                    <select id="first-pray-orator-select" class="select-orators form-select" aria-label="Default select example">
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary">Selecionar</button>
+                </div>
+            </form>
+        </section>
+        
+        <section class="last-pray-orator">
+            <form class="row gy-2 gx-3 align-items-center" id="last-pray-orator-form">
+                <h3>Ultima oração</h3>
+                <div class="col-auto">
+                    <select id="last-pray-orator-select" class="select-orators form-select" aria-label="Default select example">
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary">Selecionar</button>
+                </div>
+            </form>
+        </section>
+        
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+
+        //list
+
+        let oratorsLength = 0;
+
+        const orators = document.querySelectorAll(".select-orators");
+        const acutalOratorSelect = document.querySelector("#actual-orator-select");
+        const firstPrayOratorSelect = document.querySelector("#first-pray-orator-select");
+        const lastPrayOratorSelect = document.querySelector("#last-pray-orator-select");
+
+        let oratorsList;
+
+        axios.get('/orators')
+            .then((response) => {
+                
+                if (response.status != 200) {
+                    return;
+                }
+                if (!response.data.length) {
+                    for(i = 0; i < orators.length; i++){
+                        let option = document.createElement("option");
+                        option.setAttribute("value", "");
+                        option.innerHTML = "Cadastre um orador antes!";
+                        orators[i].appendChild(option);
+                        orators[i].disabled = true;
+                    }
+                    return;
+                }
+
+                let activeOrator = false;
+                let firstPrayOrator = false;
+                let lastPrayOrator = false;
+                oratorsLength = response.data.length;
+                oratorsList = response.data;
+                
+                response.data.map((orator) => {
+                    if(orator.active){
+                        activeOrator = true;
+                    }
+                    if(orator.firstPray){
+                        firstPrayOrator = true;
+                    }
+                    if(orator.lastPray){
+                        lastPrayOrator = true;
+                    }
+                });
+
+
+                for (let i = 0; i < response.data.length; i++) {
+
+                    if(!activeOrator && i == 0){
+                        let optionDefault = document.createElement("option");
+                        optionDefault.setAttribute("value", "");
+                        optionDefault.setAttribute("id", "default-op");
+                        optionDefault.innerHTML = "Selecione uma opção";
+                        optionDefault.setAttribute("selected","");
+                        acutalOratorSelect.append(optionDefault);
+                    }
+
+                    if(!firstPrayOrator && i == 0){
+                        let optionDefault = document.createElement("option");
+                        optionDefault.setAttribute("value", "");
+                        optionDefault.setAttribute("id", "default-op");
+                        optionDefault.innerHTML = "Selecione uma opção";
+                        optionDefault.setAttribute("selected","");
+                        firstPrayOratorSelect.append(optionDefault);
+                    }
+
+                    if(!lastPrayOrator && i == 0){
+                        let optionDefault = document.createElement("option");
+                        optionDefault.setAttribute("value", "");
+                        optionDefault.setAttribute("id", "default-op");
+                        optionDefault.innerHTML = "Selecione uma opção";
+                        optionDefault.setAttribute("selected","");
+                        lastPrayOratorSelect.append(optionDefault);
+                    }
+
+                    for(j = 0; j < orators.length; j++){
+                        let option = document.createElement("option");
+                        option.setAttribute("value", `${response.data[i].id}`);
+                        option.setAttribute("id", `orator-${response.data[i].id}`);
+                        option.innerHTML = `${response.data[i].name} - ${response.data[i].role}`;
+                        orators[j].append(option);
+                    }
+
+                }
+
+                for (let i = 0; i < response.data.length; i++){
+                    if(oratorsList[i].active){
+                        let defaultOption = acutalOratorSelect.querySelector("#default-op");
+                        if(defaultOption){
+                            acutalOratorSelect.removeChild(defaultOption);
+                        }
+                        let oratorActive = acutalOratorSelect.querySelector(`#orator-${i}`);
+                        oratorActive.setAttribute("selected", "");
+
+                    }
+                    if(oratorsList[i].firstPray){
+                        let defaultOption = firstPrayOratorSelect.querySelector("#default-op");
+                        if(defaultOption){
+                            firstPrayOratorSelect.removeChild(defaultOption);
+                        }
+                        let oratorActive = firstPrayOratorSelect.querySelector(`#orator-${i}`);
+                        oratorActive.setAttribute("selected", "");
+
+                    }
+                    if(oratorsList[i].lastPray){
+                        let defaultOption = lastPrayOratorSelect.querySelector("#default-op");
+                        if(defaultOption){
+                            lastPrayOratorSelect.removeChild(defaultOption);
+                        }
+                        let oratorActive = lastPrayOratorSelect.querySelector(`#orator-${i}`);
+                        oratorActive.setAttribute("selected", "");
+
+                    }
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+
+
+
+
+        //add
+
+        const addOratorForm = document.querySelector("#add-orator-form");
+        let oratorName = document.querySelector("#orator-name-add");
+        let oratorRole = document.querySelector("#orator-role-add");
+
+        addOratorForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            axios.post('/orators', {
+                id: oratorsLength,
+                name: oratorName.value,
+                role: oratorRole.value,
+                firstPray: false,
+                lastPray: false,
+            }).then((response) => {
+                console.log(response);
+                alert("Orador cadastrado com sucesso!");
+                document.location.reload(true);
+            }).catch((error) => {
+                console.log(error);
+            });
+        });
+
+        //change actual-orator
+
+        const actualOrator = document.querySelector("#actual-orator-form");
+        let oratorChange;
+        actualOrator.addEventListener("submit", (event) => {
+            event.preventDefault();
+            console.log(acutalOratorSelect.value);
+            console.log(oratorsList[acutalOratorSelect.value].name);
+            console.log(oratorsList[acutalOratorSelect.value].role);
+            axios.put(`/orators/${acutalOratorSelect.value}`, {
+                name: oratorsList[acutalOratorSelect.value].name,
+                role: oratorsList[acutalOratorSelect.value].role,
+                active: true,
+                firstPray: oratorsList[acutalOratorSelect.value].firstPray,
+                lastPray: oratorsList[acutalOratorSelect.value].lastPray
+            }).then((response) => {
+                console.log(response);
+                alert("Orador atual modificado com sucesso!");
+                document.location.reload(true);
+            }).catch((error) => {
+                console.log(error);
+            });
+        });
+
+        //change first-pray-orator
+
+        const firstPrayOrator = document.querySelector("#first-pray-orator-form");
+        let firstPrayChange;
+        firstPrayOrator.addEventListener("submit", (event) => {
+            event.preventDefault();
+            console.log(firstPrayOratorSelect.value);
+            console.log(oratorsList[firstPrayOratorSelect.value].name);
+            console.log(oratorsList[firstPrayOratorSelect.value].role);
+            axios.put(`/orators/${firstPrayOratorSelect.value}`, {
+                name: oratorsList[firstPrayOratorSelect.value].name,
+                role: oratorsList[firstPrayOratorSelect.value].role,
+                active: oratorsList[firstPrayOratorSelect.value].active,
+                firstPray: true,
+                lastPray: oratorsList[firstPrayOratorSelect.value].lastPray
+            }).then((response) => {
+                console.log(response);
+                alert("Primeira oração modificada com sucesso!");
+                document.location.reload(true);
+            }).catch((error) => {
+                console.log(error);
+            });
+        });
+
+        //change first-pray-orator
+
+        const lastPrayOrator = document.querySelector("#last-pray-orator-form");
+        let lastPrayChange;
+        lastPrayOrator.addEventListener("submit", (event) => {
+            event.preventDefault();
+            console.log(lastPrayOratorSelect.value);
+            console.log(oratorsList[lastPrayOratorSelect.value].name);
+            console.log(oratorsList[lastPrayOratorSelect.value].role);
+            axios.put(`/orators/${lastPrayOratorSelect.value}`, {
+                name: oratorsList[lastPrayOratorSelect.value].name,
+                role: oratorsList[lastPrayOratorSelect.value].role,
+                active: oratorsList[lastPrayOratorSelect.value].active,
+                firstPray: oratorsList[lastPrayOratorSelect.value].firstPray,
+                lastPray: true
+            }).then((response) => {
+                console.log(response);
+                alert("Ultima oração modificada com sucesso!");
+                document.location.reload(true);
+            }).catch((error) => {
+                console.log(error);
+            });
+        });
+
+        //music
+        let musicslength;
+        let musicsList;
+        axios.get('/musics')
+            .then((response) => {
+                
+                if (response.status != 200) {
+                    return;
+                }
+               
+                musicslength = response.data.length;
+                musicsList = response.data;
+                
+                
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+
+
+
+        //add music
+
+        const addMusicForm = document.querySelector("#add-music-form");
+        let musicName = document.querySelector("#music-name-add");
+        let musicPage = document.querySelector("#music-page-add");
+
+        addMusicForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            axios.post('/musics', {
+                id: musicslength,
+                name: musicName.value,
+                page: musicPage.value
+            }).then((response) => {
+                console.log(response);
+                alert("Hino cadastrado com sucesso!");
+                document.location.reload(true);
+            }).catch((error) => {
+                console.log(error);
+            });
+        });
+        
+
+    </script>
+</body>
+
+</html>
