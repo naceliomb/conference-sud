@@ -50,7 +50,6 @@
                   </div>
                 </div>
                 <div class="col-auto">
-                  <label class="visually-hidden" for="autoSizingInputGroup">Username</label>
                   <div class="input-group">
                     <div class="input-group-text">Chamado</div>
                     <input type="text" class="form-control" id="orator-role-add">
@@ -58,6 +57,26 @@
                 </div>
                 <div class="col-auto">
                   <button type="submit" class="btn btn-primary">Adicionar Orador</button>
+                </div>
+              </form>
+        </section>
+        <section class="add-music">
+            <form id="add-music-form" class="row gy-2 gx-3 align-items-center">
+                <h3>Adicionar Hino</h3>
+                <div class="col-auto">
+                  <div class="input-group">
+                    <div class="input-group-text">Nome</div>
+                    <input type="text" class="form-control" id="music-name-add">
+                  </div>
+                </div>
+                <div class="col-auto">
+                  <div class="input-group">
+                    <div class="input-group-text">Página</div>
+                    <input type="text" class="form-control" id="music-page-add">
+                  </div>
+                </div>
+                <div class="col-auto">
+                  <button type="submit" class="btn btn-primary">Adicionar Hino</button>
                 </div>
               </form>
         </section>
@@ -150,7 +169,7 @@
         addOratorForm.addEventListener("submit", (event) => {
             event.preventDefault();
             axios.post('/orators', {
-                id: oratorslength,
+                id: oratorsLength,
                 name: oratorName.value,
                 role: oratorRole.value
             }).then((response) => {
@@ -184,9 +203,47 @@
             });
         });
 
+        //music
+        let musicslength;
+        let musicsList;
+        axios.get('/musics')
+            .then((response) => {
+                
+                if (response.status != 200) {
+                    return;
+                }
+               
+                musicslength = response.data.length;
+                musicsList = response.data;
+                
+                
+            })
+            .catch((error) => {
+                console.log(error);
+            });
 
 
 
+        //add music
+
+        const addMusicForm = document.querySelector("#add-music-form");
+        let musicName = document.querySelector("#music-name-add");
+        let musicPage = document.querySelector("#music-page-add");
+
+        addMusicForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            axios.post('/musics', {
+                id: musicslength,
+                name: musicName.value,
+                page: musicPage.value
+            }).then((response) => {
+                console.log(response);
+                alert("Hino cadastrado com sucesso!");
+                document.location.reload(true);
+            }).catch((error) => {
+                console.log(error);
+            });
+        });
         
 
     </script>

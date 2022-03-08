@@ -1,8 +1,10 @@
 import express from "express";
 import fs, { read, readFile, readFileSync, writeFile, writeFileSync } from "fs";
 import Orator from "./src/models/Orator.js";
+import Music from "./src/models/Music.js";
 import path from "path";
 const oratorsFile = "./orators.json";
+const musicsFile = "./musics.json";
 
 const app = express();
 const PORT = 5000;  
@@ -23,7 +25,7 @@ app.get("/orators", (req, res) => {
 
         const parsedData = JSON.parse(data);
 
-        res.status(200).json(parsedData);
+        return res.status(200).json(parsedData);
         
     });
 });
@@ -35,7 +37,7 @@ app.post("/orators", (req,res) => {
     const { active } = req.body || false;
 
     if (!name || !role){
-        res.status(400).json("Invalid input data");
+        return res.status(400).json("Invalid input data");
     }
 
     const orator = new Orator(id, name, role, active);
@@ -58,7 +60,7 @@ app.post("/orators", (req,res) => {
             console.log("Updated file sucessfully");
         });
     });
-    res.status(200).json(orator);
+    return res.status(200).json(orator);
 
 });
 
@@ -110,6 +112,54 @@ app.put("/orators/:oratorId", (req, res) => {
     });
 
     
+});
+
+
+app.get("/musics", (req,res) => {
+    readFile(musicsFile, (error, data) => {
+        if(error){
+            console.log(error);
+            return res.status(400).json("Filed read file");
+        }
+
+        const parsedData = JSON.parse(data);
+
+        return res.status(200).json(parsedData);
+        
+    });
+});
+
+app.post("/musics", (req,res) => {
+    const { id } = req.body;
+    const { name } = req.body;
+    const { page } = req.body;
+
+    if (!name || !page){
+        return res.status(400).json("Invalid input data");
+    }
+
+    const music = new Music(id, name, page);
+
+    readFile(musicsFile, (error, data) => {
+        if(error){
+            console.log(error);
+            return res.status(400).json("Filed read file");
+        }
+
+        const parsedData = JSON.parse(data);
+        const newData = [...parsedData, music];
+
+        writeFile(musicsFile, JSON.stringify(newData, null, 2), (err) => {
+            if(err){
+                console.log("Filed to write updated data to file");
+                return res.status(500).json("Filed to write updated data to file");
+            }
+
+            console.log("Updated file sucessfully");
+        });
+    });
+    return res.status(200).json(music);
+
 });
 
 app.listen(PORT, () => {
